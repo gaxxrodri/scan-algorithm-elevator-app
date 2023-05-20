@@ -1,0 +1,13 @@
+// elevator is at group floor 0 , status idle.
+// User A at floor 10 request go down, then elevator is moving up
+// Meanwhile elevator is in moving at between floor 4 between floor 10: 
+// User B at floor 5 request to go up , then elevator would stop at floor 5 only if haven't reach 5 at that moment.
+// Elevator reaches floor 5, pickup User B.
+// User C at floor 3 request to go up, then elevator queue the request, not processing it at this point because its already passed floor 3.
+// User B want to go to floor 8, then elevator starting moving up to floor 8.
+// Elevator reaches floor 8 and drop User B.
+// User D at floor 15 want to go down, then elevator would moving up to floor 15 first before pick up user A at floor 10. 
+// Elevator reaches floor 15 and pickup User D.
+// User D want to go to floor 11,  elevator would moving down to 11.
+// Now moving down to floor 10 to pickup A.
+// User A request go to floor 0,  then Elevator move to 0,  and then move up to 3 to pick up user C.
