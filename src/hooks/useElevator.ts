@@ -1,43 +1,102 @@
 import { useEffect, useState } from 'react'
 import { useInternalController } from './useInternalController'
-import { ElevatorDirection, ElevatorStatus } from '../types.d'
+import { ElevatorStatus } from '../types.d'
+
+interface CallRequest {
+  floor: number
+  isGoingUp: boolean
+}
+
+let queue: CallRequest[] = []
+let isCurrentGoingUp: boolean = true
 
 export const useElevator = () => {
-  const [upQueue, setUpQueue] = useState<number[]>([])
-  const [downQueue, setDownQueue] = useState<number[]>([])
-
   const { up, down, getCurrentFloor, getCurrentStatus } = useInternalController()
+
+  const [run, setRun] = useState(false)
   const currentFloor = getCurrentFloor()
   const currentStatus = getCurrentStatus()
+
+  const getNextMove = (): CallRequest | undefined => {
+    if (queue.length === 0) {
+      return
+    }
+
+    // filter request in the same direction
+    const filteredQueue = queue.filter(request => {
+      if (request.isGoingUp === isCurrentGoingUp) {
+        if (isCurrentGoingUp ? request.floor > currentFloor : request.floor < currentFloor) {
+          return true
+        } else if (request.floor === currentFloor && queue[0].isGoingUp === request.isGoingUp) {
+          // remove request from queue when reached
+          const indexToRemove = queue.findIndex(
+            obj => obj.floor === request.floor && obj.isGoingUp === request.isGoingUp
+          )
+          queue.splice(indexToRemove, 1)
+          return false
+        }
+      }
+      return false
+    })
+
+    // sort requests in the same direction
+    const sortQueue = filteredQueue.sort((a, b) => {
+      if (isCurrentGoingUp) {
+        return a.floor - b.floor
+      } else {
+        return b.floor - a.floor
+      }
+    })
+
+    // if no request in the same direction, sort request in the oposite direction
+    if (filteredQueue.length === 0 && queue.length !== 0) {
+      const opositeQueue = queue.sort((a, b) => {
+        if (isCurrentGoingUp) {
+          return b.floor - a.floor
+        } else {
+          return a.floor - b.floor
+        }
+      })
+      return opositeQueue[0]
+    }
+    return sortQueue[0]
+  }
 
   useEffect(() => {
     if (currentStatus === ElevatorStatus.Running) {
       return
     }
-
-    if (upQueue.length !== 0) {
-      void moveElevator(upQueue, true)
-    } else if (downQueue.length !== 0) {
-      void moveElevator(downQueue, false)
+    if (queue.length !== 0) {
+      let nextMove = getNextMove()
+      if (nextMove !== undefined) {
+        void moveElevator(nextMove)
+      } else {
+        nextMove = getNextMove()
+        if (nextMove !== undefined) {
+          void moveElevator(nextMove)
+        }
+        setRun(false)
+      }
     }
-  }, [currentFloor, upQueue, downQueue])
+  }, [currentFloor, run])
 
-  const moveElevator = async (queue: number[], moveUp: boolean) => {
-    if (queue[0] === currentFloor) {
-      moveUp ? setUpQueue(prevQueue => prevQueue.slice(1)) : setDownQueue(prevQueue => prevQueue.slice(1))
-      return
+  const moveElevator = async (nextMove: CallRequest) => {
+    if (nextMove.floor > currentFloor) {
+      isCurrentGoingUp = true
+      await up()
+    } else if (nextMove.floor < currentFloor) {
+      isCurrentGoingUp = false
+      await down()
+    } else {
+      isCurrentGoingUp = nextMove.isGoingUp
+      setRun(prev => !prev)
     }
-    moveUp ? await up() : await down()
   }
 
-  const callElevator = (floor: number, direction: ElevatorDirection) => {
-    if (direction === ElevatorDirection.up) {
-      const updatedUpQueue = [...upQueue, floor].sort((a, b) => a - b)
-      setUpQueue(updatedUpQueue)
-    } else {
-      const updatedDownQueue = [...downQueue, floor].sort((a, b) => b - a)
-      setDownQueue(updatedDownQueue)
-    }
+  const callElevator = (floor: number, isGoingUp: boolean) => {
+    const updatedQueue = [...queue, { floor, isGoingUp }]
+    queue = updatedQueue
+    setRun(true)
   }
   return { callElevator, currentFloor, currentStatus }
 }
