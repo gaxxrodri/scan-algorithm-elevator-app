@@ -1,7 +1,6 @@
-import { useElevator } from './hooks/useElevator'
-import { ElevatorDirection } from './types.d'
 import { floors } from './constants'
 import './App.css'
+import { useElevator } from './hooks/useElevator'
 
 const App = () => {
   const { callElevator, currentFloor, currentStatus } = useElevator()
@@ -10,8 +9,8 @@ const App = () => {
     <>
       <div>Elevator app </div>
       <div className='floating'>
-        <text>Current Floor {currentFloor}</text>
-        <text>Current status {currentStatus}</text>
+        <h4>Current Floor {currentFloor}</h4>
+        <h4>Current status {currentStatus}</h4>
       </div>
       <div className='elevator-container'>
         {floors.map((floor: number) => {
@@ -20,16 +19,18 @@ const App = () => {
               <button
                 className='up-button'
                 onClick={() => {
-                  callElevator(floor, ElevatorDirection.up)
+                  callElevator(floor, true)
                 }}
               >
                 Up
               </button>
-              <text className='floor-text-number'>{floor}</text>
+              <div className='floor-text-container' style={{ borderColor: currentFloor === floor ? '#646cff' : '' }}>
+                <h5 className='floor-text-number'>{floor}</h5>
+              </div>
               <button
                 className='down-button'
                 onClick={() => {
-                  callElevator(floor, ElevatorDirection.down)
+                  callElevator(floor, false)
                 }}
               >
                 Down
