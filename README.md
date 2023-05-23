@@ -1,1 +1,1 @@
-# scan-algorithm-elevator-app
+# Elevator app based in SCAN algorithm
