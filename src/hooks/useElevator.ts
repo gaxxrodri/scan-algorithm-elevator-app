@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useInternalController } from './useInternalController'
 import { ElevatorStatus } from '../types.d'
+import { floors } from '../constants'
 
 interface CallRequest {
   floor: number
   isGoingUp: boolean
+  dropUser?: boolean
 }
 
 let queue: CallRequest[] = []
@@ -23,42 +25,53 @@ export const useElevator = () => {
     }
 
     // filter request in the same direction
-    const filteredQueue = queue.filter(request => {
+    const filteredQueue = queue.filter((request: CallRequest) => {
       if (request.isGoingUp === isCurrentGoingUp) {
         if (isCurrentGoingUp ? request.floor > currentFloor : request.floor < currentFloor) {
           return true
         } else if (request.floor === currentFloor && queue[0].isGoingUp === request.isGoingUp) {
           // remove request from queue when reached
           const indexToRemove = queue.findIndex(
-            obj => obj.floor === request.floor && obj.isGoingUp === request.isGoingUp
+            (queueElement: CallRequest) =>
+              queueElement.floor === request.floor && queueElement.isGoingUp === request.isGoingUp
           )
-          queue.splice(indexToRemove, 1)
+          if (indexToRemove > -1) {
+            queue.splice(indexToRemove, 1)
+            if (request.dropUser !== true) {
+              queue.push({
+                floor: getDestinationFloor(currentFloor, isCurrentGoingUp, floors),
+                isGoingUp: request.isGoingUp,
+                dropUser: true,
+              })
+            }
+          }
           return false
         }
       }
       return false
     })
 
+    // remove stop request from queue
+    const indexToRemove = queue.findIndex(
+      (queueElement: CallRequest) => queueElement.floor === currentFloor && queueElement.dropUser === true
+    )
+    if (indexToRemove > -1) {
+      queue.splice(indexToRemove, 1)
+    }
+
     // sort requests in the same direction
-    const sortQueue = filteredQueue.sort((a, b) => {
-      if (isCurrentGoingUp) {
-        return a.floor - b.floor
-      } else {
-        return b.floor - a.floor
-      }
+    const sortQueue = filteredQueue.sort((a: CallRequest, b: CallRequest) => {
+      return isCurrentGoingUp ? a.floor - b.floor : b.floor - a.floor
     })
 
-    // if no request in the same direction, sort request in the oposite direction
+    // if no request in the same direction, sort request in the opposite direction
     if (filteredQueue.length === 0 && queue.length !== 0) {
-      const opositeQueue = queue.sort((a, b) => {
-        if (isCurrentGoingUp) {
-          return b.floor - a.floor
-        } else {
-          return a.floor - b.floor
-        }
+      const oppositeQueue = queue.sort((a: CallRequest, b: CallRequest) => {
+        return isCurrentGoingUp ? b.floor - a.floor : a.floor - b.floor
       })
-      return opositeQueue[0]
+      return oppositeQueue[0]
     }
+
     return sortQueue[0]
   }
 
@@ -98,5 +111,22 @@ export const useElevator = () => {
     queue = updatedQueue
     setRun(true)
   }
-  return { callElevator, currentFloor, currentStatus }
+  return { callElevator, currentFloor, currentStatus, queue }
+}
+
+const getDestinationFloor = (currentFloor: number, isGoingUp: boolean, floors: number[]): number => {
+  // TODO Refactor logic in while loop
+  let destinationFloor: any = null
+  const getCurrentRequest = () =>
+    prompt(`Elevator has reached floor ${currentFloor}. Please enter destination floor:`) as string
+
+  const regex = /^(0|1[0-5]|[1-9])$/
+  while (
+    !regex.test(destinationFloor) || +destinationFloor === currentFloor || isGoingUp
+      ? +destinationFloor < currentFloor
+      : +destinationFloor > currentFloor || destinationFloor === null
+  ) {
+    destinationFloor = getCurrentRequest()
+  }
+  return +destinationFloor
 }
