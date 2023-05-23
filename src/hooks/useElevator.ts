@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useInternalController } from './useInternalController'
 import { ElevatorStatus } from '../types.d'
-import { floors } from '../constants'
 
 interface CallRequest {
   floor: number
@@ -39,7 +38,7 @@ export const useElevator = () => {
             queue.splice(indexToRemove, 1)
             if (request.dropUser !== true) {
               queue.push({
-                floor: getDestinationFloor(currentFloor, isCurrentGoingUp, floors),
+                floor: getDestinationFloor(currentFloor, isCurrentGoingUp),
                 isGoingUp: request.isGoingUp,
                 dropUser: true,
               })
@@ -114,7 +113,7 @@ export const useElevator = () => {
   return { callElevator, currentFloor, currentStatus, queue }
 }
 
-const getDestinationFloor = (currentFloor: number, isGoingUp: boolean, floors: number[]): number => {
+const getDestinationFloor = (currentFloor: number, isGoingUp: boolean): number => {
   // TODO Refactor logic in while loop
   let destinationFloor: any = null
   const getCurrentRequest = () =>
