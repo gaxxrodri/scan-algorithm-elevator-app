@@ -1,4 +1,4 @@
-# Elevator app based in SCAN algorithm
+# Elevator app based on the SCAN algorithm
  
  
 ## Deploy
