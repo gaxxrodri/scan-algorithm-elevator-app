@@ -12,13 +12,13 @@
     "coverage": "vitest --coverage"
   },
   "dependencies": {
-    "@testing-library/react-hooks": "^8.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
+    "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.4.3",
     "@types/react": "^17.0.59",
     "@types/react-dom": "^18.0.11",
