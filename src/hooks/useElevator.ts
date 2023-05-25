@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useInternalController } from './useInternalController'
-import { ElevatorStatus } from '../types.d'
+import { ElevatorStatus, type FloorRequest } from '../common/types'
 import { filterQueue, updateQueueIfReachFloor } from './utils'
-
-export interface FloorRequest {
-  floor: number
-  isGoingUp: boolean
-  dropUser?: boolean
-}
 
 let isCurrentGoingUp: boolean = true
 let queue: FloorRequest[] = []

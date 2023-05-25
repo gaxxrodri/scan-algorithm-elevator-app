@@ -1,4 +1,4 @@
-import { type FloorRequest } from './useElevator'
+import { type FloorRequest } from '../common/types'
 
 export const filterQueue = (queue: FloorRequest[], isCurrentGoingUp: boolean, currentFloor: number): FloorRequest[] => {
   const filteredQueue = queue.filter(
@@ -24,7 +24,7 @@ export const updateQueueIfReachFloor = (
 
   completedRequests.forEach(request => {
     if (request.dropUser !== true) {
-      // ask for destination floor and add to queue
+      // Ask for destination floor and add to queue
       const destinationFloor = getDestinationFloor(currentFloor, isCurrentGoingUp)
       updateQueue.push({ floor: destinationFloor, isGoingUp: isCurrentGoingUp, dropUser: true })
     } else {

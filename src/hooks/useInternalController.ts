@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ElevatorStatus } from '../types.d'
+import { ElevatorStatus } from '../common/types'
 
 interface InternalControl {
   getCurrentStatus: () => ElevatorStatus

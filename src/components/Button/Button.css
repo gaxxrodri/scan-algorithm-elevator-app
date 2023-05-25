@@ -1,0 +1,10 @@
+.floor-button {
+    width: 33%;
+    height: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.25s;
+    color:white;
+  }
+  
