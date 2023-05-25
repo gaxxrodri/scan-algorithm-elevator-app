@@ -20,6 +20,7 @@ const App = () => {
           return (
             <div key={floor} className='floor-container'>
               <button
+                disabled={floor === 15}
                 style={{
                   border: queue.some(
                     request => request.floor === floor && request.isGoingUp && request.dropUser !== true
@@ -45,6 +46,7 @@ const App = () => {
                 </h5>
               </div>
               <button
+                disabled={floor === 0}
                 style={{
                   border: queue.some(
                     request => request.floor === floor && !request.isGoingUp && request.dropUser !== true
