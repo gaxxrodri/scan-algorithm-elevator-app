@@ -12,6 +12,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "types": ["vitest/globals"],
 
     /* Linting */
     "strict": true,
@@ -19,6 +20,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "src/**/*.ts", "vite.config.ts"],
+  
   "references": [{ "path": "./tsconfig.node.json" }]
 }
