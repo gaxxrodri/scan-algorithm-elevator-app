@@ -1,35 +1,36 @@
 import { type FloorRequest } from '../common/types'
 
-export const filterQueue = (queue: FloorRequest[], isCurrentGoingUp: boolean, currentFloor: number): FloorRequest[] => {
-  const filteredQueue = queue.filter(
+export const filterQueue = (
+  requestQueue: FloorRequest[],
+  isCurrentGoingUp: boolean,
+  currentFloor: number
+): FloorRequest[] => {
+  const filteredRequestQueue = requestQueue.filter(
     request =>
       request.isGoingUp === isCurrentGoingUp &&
       (isCurrentGoingUp ? request.floor > currentFloor : request.floor < currentFloor)
   )
-  return filteredQueue
+  return filteredRequestQueue
 }
 
 export const updateQueueIfReachFloor = (
-  queue: FloorRequest[],
+  requestQueue: FloorRequest[],
   isCurrentGoingUp: boolean,
-  currentFloor: number,
-  setDropUserMessage: (message: string) => void
+  currentFloor: number
 ): FloorRequest[] => {
-  const updateQueue = queue.filter(
+  const updateQueue = requestQueue.filter(
     request => !(request.isGoingUp === isCurrentGoingUp && request.floor === currentFloor)
   )
 
-  const completedRequests = queue.filter(
+  const completedRequests = requestQueue.filter(
     request => request.isGoingUp === isCurrentGoingUp && request.floor === currentFloor
   )
 
   completedRequests.forEach(request => {
     if (request.dropUser !== true) {
-      // Ask for destination floor and add to queue
+      // Ask for destination floor and add to requestQueue
       const destinationFloor = getDestinationFloor(currentFloor, isCurrentGoingUp)
       updateQueue.push({ floor: destinationFloor, isGoingUp: isCurrentGoingUp, dropUser: true })
-    } else {
-      setDropUserMessage(`User arrived at floor ${currentFloor}.`)
     }
   })
 

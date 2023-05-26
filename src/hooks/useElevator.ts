@@ -4,11 +4,10 @@ import { ElevatorStatus, type FloorRequest } from '../common/types'
 import { filterQueue, updateQueueIfReachFloor } from './utils'
 
 let isCurrentGoingUp: boolean = true
-let queue: FloorRequest[] = []
+let requestQueue: FloorRequest[] = []
 
 export const useElevator = () => {
   const { up, down, getCurrentFloor, getCurrentStatus } = useInternalController()
-  const [dropUserMessage, setDropUserMessage] = useState<string>('')
   const currentFloor = getCurrentFloor()
   const currentStatus = getCurrentStatus()
   const [run, setRun] = useState(false)
@@ -17,7 +16,7 @@ export const useElevator = () => {
     if (currentStatus === ElevatorStatus.Running) {
       return
     }
-    if (queue.length !== 0) {
+    if (requestQueue.length !== 0) {
       const nextMove = getNextMove()
       if (nextMove !== undefined) {
         void moveElevator(nextMove)
@@ -26,13 +25,13 @@ export const useElevator = () => {
   }, [currentFloor, run])
 
   const getNextMove = (): FloorRequest | undefined => {
-    if (queue.length === 0) {
+    if (requestQueue.length === 0) {
       return
     }
-    queue = updateQueueIfReachFloor(queue, isCurrentGoingUp, currentFloor, setDropUserMessage)
+    requestQueue = updateQueueIfReachFloor(requestQueue, isCurrentGoingUp, currentFloor)
 
-    // Filter queue by elevator direction and then sort it
-    const sortedQueue = filterQueue(queue, isCurrentGoingUp, currentFloor).sort((a, b) =>
+    // Filter requestQueue by elevator direction and then sort it
+    const sortedQueue = filterQueue(requestQueue, isCurrentGoingUp, currentFloor).sort((a, b) =>
       isCurrentGoingUp ? a.floor - b.floor : b.floor - a.floor
     )
 
@@ -40,7 +39,7 @@ export const useElevator = () => {
       return sortedQueue[0]
     }
     // If there is no request in the current direction, sort queue in the oposite direction
-    const oppositeSortedQueue = queue.sort((a, b) => (isCurrentGoingUp ? b.floor - a.floor : a.floor - b.floor))
+    const oppositeSortedQueue = requestQueue.sort((a, b) => (isCurrentGoingUp ? b.floor - a.floor : a.floor - b.floor))
     return oppositeSortedQueue[0]
   }
 
@@ -59,9 +58,9 @@ export const useElevator = () => {
   }
 
   const callElevator = (floor: number, isGoingUp: boolean) => {
-    const updatedQueue = [...queue, { floor, isGoingUp }]
-    queue = updatedQueue
+    const updatedRequestQueue = [...requestQueue, { floor, isGoingUp }]
+    requestQueue = updatedRequestQueue
     setRun(prev => !prev)
   }
-  return { callElevator, currentFloor, currentStatus, queue, dropUserMessage }
+  return { callElevator, currentFloor, currentStatus, requestQueue }
 }
