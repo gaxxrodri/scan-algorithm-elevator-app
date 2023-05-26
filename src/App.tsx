@@ -2,14 +2,23 @@ import { ELEVATOR_STATUS_TEXT, floors } from './common/constants'
 import './App.css'
 import { useElevator } from './hooks/useElevator'
 import { ElevatorStatus } from './common/types'
+import { Toaster, toast } from 'sonner'
 import Button from './components/Button/Button'
 import { isFloorRequested } from './common/utils'
+import { useEffect } from 'react'
 
 const App = () => {
-  const { callElevator, currentFloor, currentStatus, queue } = useElevator()
+  const { callElevator, currentFloor, currentStatus, queue, dropUserMessage } = useElevator()
+
+  useEffect(() => {
+    if (dropUserMessage !== '') {
+      toast.success(dropUserMessage)
+    }
+  }, [dropUserMessage])
 
   return (
     <>
+      <Toaster position='top-right' richColors />
       <div>
         <h3>{ELEVATOR_STATUS_TEXT}</h3>
         <h4 style={{ color: currentStatus === ElevatorStatus.Running ? 'green' : 'red' }}>{currentStatus}</h4>

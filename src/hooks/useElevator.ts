@@ -8,6 +8,7 @@ let queue: FloorRequest[] = []
 
 export const useElevator = () => {
   const { up, down, getCurrentFloor, getCurrentStatus } = useInternalController()
+  const [dropUserMessage, setDropUserMessage] = useState<string>('')
   const currentFloor = getCurrentFloor()
   const currentStatus = getCurrentStatus()
   const [run, setRun] = useState(false)
@@ -28,7 +29,7 @@ export const useElevator = () => {
     if (queue.length === 0) {
       return
     }
-    queue = updateQueueIfReachFloor(queue, isCurrentGoingUp, currentFloor)
+    queue = updateQueueIfReachFloor(queue, isCurrentGoingUp, currentFloor, setDropUserMessage)
 
     // Filter queue by elevator direction and then sort it
     const sortedQueue = filterQueue(queue, isCurrentGoingUp, currentFloor).sort((a, b) =>
@@ -62,5 +63,5 @@ export const useElevator = () => {
     queue = updatedQueue
     setRun(prev => !prev)
   }
-  return { callElevator, currentFloor, currentStatus, queue }
+  return { callElevator, currentFloor, currentStatus, queue, dropUserMessage }
 }
