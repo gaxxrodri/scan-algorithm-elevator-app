@@ -12,7 +12,8 @@ export const filterQueue = (queue: FloorRequest[], isCurrentGoingUp: boolean, cu
 export const updateQueueIfReachFloor = (
   queue: FloorRequest[],
   isCurrentGoingUp: boolean,
-  currentFloor: number
+  currentFloor: number,
+  setDropUserMessage: (message: string) => void
 ): FloorRequest[] => {
   const updateQueue = queue.filter(
     request => !(request.isGoingUp === isCurrentGoingUp && request.floor === currentFloor)
@@ -28,7 +29,7 @@ export const updateQueueIfReachFloor = (
       const destinationFloor = getDestinationFloor(currentFloor, isCurrentGoingUp)
       updateQueue.push({ floor: destinationFloor, isGoingUp: isCurrentGoingUp, dropUser: true })
     } else {
-      alert(`User arrived at floor ${currentFloor}.`)
+      setDropUserMessage(`User arrived at floor ${currentFloor}.`)
     }
   })
 
