@@ -8,13 +8,15 @@ import { isFloorRequested } from './common/utils'
 import { useEffect } from 'react'
 
 const App = () => {
-  const { callElevator, currentFloor, currentStatus, queue, dropUserMessage } = useElevator()
+  const { callElevator, currentFloor, currentStatus, requestQueue } = useElevator()
 
   useEffect(() => {
-    if (dropUserMessage !== '') {
-      toast.success(dropUserMessage)
-    }
-  }, [dropUserMessage])
+    requestQueue.forEach(request => {
+      request.floor === currentFloor &&
+        request.dropUser === true &&
+        toast.success(`User arrived at floor ${currentFloor}.`)
+    })
+  }, [currentFloor])
 
   return (
     <>
@@ -27,18 +29,18 @@ const App = () => {
         {floors.map((floor: number) => {
           return (
             <div key={floor} className='floor-container'>
-              <Button floor={floor} requestQueue={queue} callElevator={callElevator} isUpButton />
+              <Button floor={floor} requestQueue={requestQueue} callElevator={callElevator} isUpButton />
               <div className='floor-text-container' style={{ borderColor: currentFloor === floor ? '#646cff' : '' }}>
                 <h5
                   className='floor-text-number'
                   style={{
-                    color: isFloorRequested(queue, floor) ? '#ff64ed' : '',
+                    color: isFloorRequested(requestQueue, floor) ? '#ff64ed' : '',
                   }}
                 >
                   {floor}
                 </h5>
               </div>
-              <Button floor={floor} requestQueue={queue} callElevator={callElevator} isUpButton={false} />
+              <Button floor={floor} requestQueue={requestQueue} callElevator={callElevator} isUpButton={false} />
             </div>
           )
         })}
