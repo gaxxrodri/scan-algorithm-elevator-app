@@ -10,5 +10,5 @@ export enum ElevatorStatus {
 export interface FloorRequest {
   floor: number
   isGoingUp: boolean
-  dropUser?: boolean
+  dropUser: boolean
 }

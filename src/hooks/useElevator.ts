@@ -28,7 +28,14 @@ export const useElevator = () => {
     if (requestQueue.length === 0) {
       return
     }
-    requestQueue = updateQueueIfReachFloor(requestQueue, isCurrentGoingUp, currentFloor)
+
+    updateQueueIfReachFloor(requestQueue, isCurrentGoingUp, currentFloor)
+      .then(updatedQueue => {
+        requestQueue = updatedQueue
+      })
+      .catch(err => {
+        console.log(err)
+      })
 
     // Filter requestQueue by elevator direction and then sort it
     const sortedQueue = filterQueue(requestQueue, isCurrentGoingUp, currentFloor).sort((a, b) =>
@@ -51,14 +58,14 @@ export const useElevator = () => {
       isCurrentGoingUp = false
       await down()
     } else {
-      // If elevator reach a floor request in the opposite direction of its movement. Set direction and re-run
+      // If elevator reach a floor request in the opposite direction of its movement. Set direction from next move request and re-run
       isCurrentGoingUp = nextMove.isGoingUp
       setRun(prev => !prev)
     }
   }
 
   const callElevator = (floor: number, isGoingUp: boolean) => {
-    const updatedRequestQueue = [...requestQueue, { floor, isGoingUp }]
+    const updatedRequestQueue = [...requestQueue, { floor, isGoingUp, dropUser: false }]
     requestQueue = updatedRequestQueue
     setRun(prev => !prev)
   }
