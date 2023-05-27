@@ -12,9 +12,7 @@ const App = () => {
 
   useEffect(() => {
     requestQueue.forEach(request => {
-      request.floor === currentFloor &&
-        request.dropUser === true &&
-        toast.success(`User arrived at floor ${currentFloor}.`)
+      request.floor === currentFloor && request.dropUser && toast.success(`User arrived at floor ${currentFloor}.`)
     })
   }, [currentFloor])
 

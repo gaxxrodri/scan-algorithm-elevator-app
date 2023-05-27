@@ -28,7 +28,14 @@ export const useElevator = () => {
     if (requestQueue.length === 0) {
       return
     }
-    requestQueue = updateQueueIfReachFloor(requestQueue, isCurrentGoingUp, currentFloor)
+
+    updateQueueIfReachFloor(requestQueue, isCurrentGoingUp, currentFloor)
+      .then(updatedQueue => {
+        requestQueue = updatedQueue
+      })
+      .catch(err => {
+        console.log(err)
+      })
 
     // Filter requestQueue by elevator direction and then sort it
     const sortedQueue = filterQueue(requestQueue, isCurrentGoingUp, currentFloor).sort((a, b) =>
