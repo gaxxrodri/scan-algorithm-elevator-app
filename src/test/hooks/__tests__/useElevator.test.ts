@@ -39,7 +39,7 @@ describe('useElevator hook tests', () => {
         result.current.callElevator(newRequest.floor, newRequest.isGoingUp)
       })
 
-      expect(result.current.queue).toContainEqual(newRequest)
+      expect(result.current.requestQueue).toContainEqual({ ...newRequest, dropUser: false })
     })
     test('should add new request to requestsQueue when callElevator is called when is running', async () => {
       useInternalControllerStub.returns({
@@ -51,13 +51,13 @@ describe('useElevator hook tests', () => {
 
       const { result } = renderHook(() => useElevator())
 
-      const newRequest = { floor: 5, isGoingUp: true }
+      const newRequest = { floor: 5, isGoingUp: true, dropUser: false }
 
       act(() => {
         result.current.callElevator(newRequest.floor, newRequest.isGoingUp)
       })
 
-      expect(result.current.queue).toContainEqual(newRequest)
+      expect(result.current.requestQueue).toContainEqual({ ...newRequest, dropUser: false })
     })
   })
 })

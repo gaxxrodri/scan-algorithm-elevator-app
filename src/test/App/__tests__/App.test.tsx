@@ -9,7 +9,7 @@ describe('App component', () => {
     render(<App />)
 
     // Verify that elevator status is displayed
-    expect(screen.getByText('Elevator status:')).toBeInTheDocument()
+    expect(screen.getByText('Elevator Status:')).toBeInTheDocument()
     expect(screen.getByText('Idle')).toBeInTheDocument()
 
     // Verify that buttons are present and can be clicked

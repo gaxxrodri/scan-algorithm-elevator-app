@@ -18,21 +18,21 @@ export const updateQueueIfReachFloor = (
   isCurrentGoingUp: boolean,
   currentFloor: number
 ): FloorRequest[] => {
+  // Remove reached floor
   const updateQueue = requestQueue.filter(
     request => !(request.isGoingUp === isCurrentGoingUp && request.floor === currentFloor)
   )
 
-  const completedRequests = requestQueue.filter(
-    request => request.isGoingUp === isCurrentGoingUp && request.floor === currentFloor
+  // Find if reached floor has to pickup user
+  const completedRequests = requestQueue.find(
+    request => request.isGoingUp === isCurrentGoingUp && request.floor === currentFloor && !request.dropUser
   )
 
-  completedRequests.forEach(request => {
-    if (request.dropUser !== true) {
-      // Ask for destination floor and add to requestQueue
-      const destinationFloor = getDestinationFloor(currentFloor, isCurrentGoingUp)
-      updateQueue.push({ floor: destinationFloor, isGoingUp: isCurrentGoingUp, dropUser: true })
-    }
-  })
+  // Ask for destination floor if is a pickup floor request
+  if (completedRequests !== undefined) {
+    const destinationFloor = getDestinationFloor(currentFloor, isCurrentGoingUp)
+    updateQueue.push({ floor: destinationFloor, isGoingUp: isCurrentGoingUp, dropUser: true })
+  }
 
   return updateQueue
 }
