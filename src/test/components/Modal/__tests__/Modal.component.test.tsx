@@ -1,7 +1,7 @@
 import { render, fireEvent } from '@testing-library/react'
 import sinon from 'sinon'
 import { test } from 'vitest'
-import Modal from '../../../../components/Modal.tsx/Modal'
+import Modal from '../../../../components/Modal/Modal'
 
 describe('Modal component', () => {
   const addStopSpy = sinon.spy()
