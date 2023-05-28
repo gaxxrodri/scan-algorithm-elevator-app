@@ -20,7 +20,7 @@ Typescript, Javascript, ReactJS
 Testing using React Testing Library, Vitest and Sinon
 
 ### Coverage: 
-<img width="932" alt="Captura de Pantalla 2023-05-26 a las 1 52 49 a  m" src="https://github.com/gaxxrodri/scan-algorithm-elevator-app/assets/76969924/20d1e96a-2f79-49d4-804d-52b196627336">
+<img width="957" alt="Captura de Pantalla 2023-05-28 a las 9 29 55 p  m" src="https://github.com/gaxxrodri/scan-algorithm-elevator-app/assets/76969924/a59c3f67-237b-4135-bc54-c334a5f923d1">
 
 
 ## Available Scripts
