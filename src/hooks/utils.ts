@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/promise-function-async */
+import { toast } from 'sonner'
 import { type FloorRequest } from '../common/types'
 
 export const filterQueue = (
@@ -14,53 +14,53 @@ export const filterQueue = (
   return filteredRequestQueue
 }
 
-export const updateQueueIfReachFloor = async (
+export const processReachedFloor = (
   requestQueue: FloorRequest[],
   isCurrentGoingUp: boolean,
-  currentFloor: number
-): Promise<FloorRequest[]> => {
-  // Remove reached floor
+  currentFloor: number,
+  setOpenModal: (open: boolean) => void
+): FloorRequest[] | undefined => {
+  // Remove reached floor.
   const updateQueue = requestQueue.filter(
     request => !(request.isGoingUp === isCurrentGoingUp && request.floor === currentFloor)
   )
 
-  // Find if reached floor has to pickup user
+  // Display message if user arrived.
+  requestQueue.forEach(request => {
+    request.floor === currentFloor && request.dropUser && toast.success(`User arrived at floor ${currentFloor}.`)
+  })
+
+  // Find if reached floor has to pickup user.
   const completedRequests = requestQueue.find(
     request => request.isGoingUp === isCurrentGoingUp && request.floor === currentFloor && !request.dropUser
   )
 
-  // Ask for destination floor if is a pickup floor request
+  // Open modal and ask for destination floor.
   if (completedRequests !== undefined) {
-    const destinationFloor = await getDestinationFloor(currentFloor, isCurrentGoingUp)
-    updateQueue.push({ floor: destinationFloor, isGoingUp: isCurrentGoingUp, dropUser: true })
+    setOpenModal(true)
   }
 
-  return updateQueue
+  return updateQueue.length === requestQueue.length ? undefined : updateQueue
 }
 
-export const getDestinationFloor = (currentFloor: number, isGoingUp: boolean): Promise<number> => {
-  const regex = /^(0|1[0-5]|[1-9])$/
-
-  const validateDestination = (destination: string) => {
-    const floor = Number(destination)
-    if (!regex.test(destination) || floor === currentFloor) return false
-    if (isGoingUp ? floor < currentFloor : floor > currentFloor) return false
-    return true
+export const getNextMove = (
+  requestQueue: FloorRequest[],
+  isCurrentGoingUp: boolean,
+  currentFloor: number
+): FloorRequest | undefined => {
+  if (requestQueue.length === 0) {
+    return
   }
 
-  // Recursive function
-  const getValidDestinationFloor = (): Promise<number> => {
-    // TODO replace this prompt with a modal or something more user friendly and testable
-    const destinationFloor = prompt(
-      `Elevator has reached floor ${currentFloor}. Please enter a valid destination floor:`
-    ) as string
+  // Filter requestQueue by elevator direction and then sort it
+  const sortedQueue = filterQueue(requestQueue, isCurrentGoingUp, currentFloor).sort((a, b) =>
+    isCurrentGoingUp ? a.floor - b.floor : b.floor - a.floor
+  )
 
-    if (validateDestination(destinationFloor)) {
-      return Promise.resolve(Number(destinationFloor))
-    } else {
-      return getValidDestinationFloor() // recurse function until user enter a valid destination floor
-    }
+  if (sortedQueue.length > 0) {
+    return sortedQueue[0]
   }
-
-  return getValidDestinationFloor()
+  // If there is no request in the current direction, sort queue in the oposite direction
+  const oppositeSortedQueue = requestQueue.sort((a, b) => (isCurrentGoingUp ? b.floor - a.floor : a.floor - b.floor))
+  return oppositeSortedQueue[0]
 }
