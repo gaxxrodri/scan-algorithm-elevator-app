@@ -1,7 +1,8 @@
 import { expect } from 'vitest'
 import * as sinon from 'sinon'
-import { filterQueue } from '../../../hooks/utils'
+import { filterQueue, getNextMove, processReachedFloor } from '../../../hooks/utils'
 import { type FloorRequest } from '../../../common/types'
+import { toast } from 'sonner'
 
 describe('Utils function tests', () => {
   afterEach(() => {
@@ -13,20 +14,20 @@ describe('Utils function tests', () => {
       const currentFloor = 2
       const isCurrentGoingUp = true
       const requests: FloorRequest[] = [
-        { floor: 1, isGoingUp: true },
-        { floor: 2, isGoingUp: false },
-        { floor: 3, isGoingUp: true },
+        { floor: 1, isGoingUp: true, dropUser: false },
+        { floor: 2, isGoingUp: false, dropUser: false },
+        { floor: 3, isGoingUp: true, dropUser: false },
       ]
       const result = filterQueue(requests, isCurrentGoingUp, currentFloor)
-      expect(result).toEqual([{ floor: 3, isGoingUp: true }])
+      expect(result).toEqual([{ floor: 3, isGoingUp: true, dropUser: false }])
     })
     test('should return an empty array', () => {
       const currentFloor = 4
       const isCurrentGoingUp = true
       const requests: FloorRequest[] = [
-        { floor: 1, isGoingUp: true },
-        { floor: 2, isGoingUp: false },
-        { floor: 3, isGoingUp: true },
+        { floor: 1, isGoingUp: true, dropUser: false },
+        { floor: 2, isGoingUp: false, dropUser: false },
+        { floor: 3, isGoingUp: true, dropUser: false },
       ]
       const result = filterQueue(requests, isCurrentGoingUp, currentFloor)
       expect(result).toEqual([])
@@ -35,66 +36,149 @@ describe('Utils function tests', () => {
       const currentFloor = 0
       const isCurrentGoingUp = true
       const requests: FloorRequest[] = [
-        { floor: 1, isGoingUp: true },
-        { floor: 2, isGoingUp: false },
-        { floor: 3, isGoingUp: true },
+        { floor: 1, isGoingUp: true, dropUser: false },
+        { floor: 2, isGoingUp: false, dropUser: false },
+        { floor: 3, isGoingUp: true, dropUser: false },
       ]
       const result = filterQueue(requests, isCurrentGoingUp, currentFloor)
       expect(result).toEqual([
-        { floor: 1, isGoingUp: true },
-        { floor: 3, isGoingUp: true },
+        { floor: 1, isGoingUp: true, dropUser: false },
+        { floor: 3, isGoingUp: true, dropUser: false },
       ])
     })
     test('should return array with elements the with property isGointUp false', () => {
       const currentFloor = 5
       const isCurrentGoingUp = false
       const requests: FloorRequest[] = [
-        { floor: 1, isGoingUp: true },
-        { floor: 2, isGoingUp: false },
-        { floor: 3, isGoingUp: true },
+        { floor: 1, isGoingUp: true, dropUser: false },
+        { floor: 2, isGoingUp: false, dropUser: false },
+        { floor: 3, isGoingUp: true, dropUser: false },
       ]
       const result = filterQueue(requests, isCurrentGoingUp, currentFloor)
-      expect(result).toEqual([{ floor: 2, isGoingUp: false }])
+      expect(result).toEqual([{ floor: 2, isGoingUp: false, dropUser: false }])
     })
   })
 
-  describe('updateQueueIfReachFloor function', () => {
-    test('should return an array with the last element of the requests array', () => {
-      // TODO  Using sinon.stub not working, test dont fail but freeze.
-      //
-      //
-      // const promptStub = sinon.stub(window, 'prompt')
-      // const alertStub = sinon.stub(window, 'alert')
-      // promptStub.returns('5')
-      // const isCurrentGoingUp = true
-      // const currentFloor = 2
-      // const requests: FloorRequest[] = [
-      //   { floor: 1, isGoingUp: true },
-      //   { floor: 2, isGoingUp: true },
-      //   { floor: 3, isGoingUp: true, dropUser: true },
-      // ]
-      // const result = updateQueueIfReachFloor(requests, isCurrentGoingUp, currentFloor)
-      // expect(promptStub.calledOnce).toBe(true)
-      // expect(alertStub.calledOnce).toBe(true)
-      // expect(result).toEqual([
-      //   { floor: 1, isGoingUp: true },
-      //   { floor: 5, isGoingUp: true, dropUser: true },
-      // ])
+  describe('processReachedFloor function', () => {
+    test('should return undefined when the request floor is not reached', () => {
+      const requestQueue = [
+        { floor: 1, isGoingUp: true, dropUser: true },
+        { floor: 2, isGoingUp: true, dropUser: false },
+      ]
+      const isCurrentGoingUp = true
+      const currentFloor = 3
+      const setOpenModal = sinon.spy()
+
+      const result = processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setOpenModal)
+
+      expect(result).toBeUndefined()
+      expect(setOpenModal.called).toBe(false)
+    })
+    test("should return undefined and not call setOpenModal if current floor is equal but direction doesn't match", () => {
+      const requestQueue = [
+        { floor: 1, isGoingUp: false, dropUser: true },
+        { floor: 3, isGoingUp: false, dropUser: false },
+      ]
+      const isCurrentGoingUp = true
+      const currentFloor = 3
+      const setOpenModal = sinon.spy()
+
+      const result = processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setOpenModal)
+
+      expect(result).toBeUndefined()
+      expect(setOpenModal.called).toBe(false)
+    })
+    test('should remove rechead request from queue and call setOpenModal', () => {
+      const requestQueue = [
+        { floor: 3, isGoingUp: true, dropUser: false },
+        { floor: 4, isGoingUp: true, dropUser: false },
+      ]
+      const isCurrentGoingUp = true
+      const currentFloor = 3
+      const setOpenModal = sinon.spy()
+
+      const result = processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setOpenModal)
+
+      expect(result).toEqual([{ floor: 4, isGoingUp: true, dropUser: false }])
+      expect(setOpenModal.calledOnce).toBe(true)
+    })
+    test('should call toast function with the correct message when drop user', () => {
+      const successToastStub = sinon.stub(toast, 'success')
+
+      const requestQueue = [
+        { floor: 3, isGoingUp: true, dropUser: true },
+        { floor: 1, isGoingUp: true, dropUser: false },
+      ]
+      const isCurrentGoingUp = true
+      const currentFloor = 3
+      const setOpenModal = sinon.spy()
+
+      processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setOpenModal)
+
+      sinon.assert.calledWith(successToastStub, `User arrived at floor ${currentFloor}.`)
+      afterEach(() => {
+        successToastStub.restore()
+      })
     })
   })
 
-  describe('getDestinationFloor function', () => {
-    test('getDestinationFloor function', () => {
-      // TODO  Using sinon.stub not working, test dont fail but freeze.
-      //
-      //
-      //   const currentFloor = 2
-      //   const isCurrentGoingUp = true
-      //   const promptStub = sinon.stub(window, 'prompt')
-      //   promptStub.returns('5')
-      //   const result = getDestinationFloor(currentFloor, isCurrentGoingUp)
-      //   expect(promptStub.calledOnce).toBe(true)
-      //   expect(result).toEqual(5)
+  describe('getNextMove function', () => {
+    test('should return undefined when request queue is empty', () => {
+      const requestQueue: FloorRequest[] = []
+      const isCurrentGoingUp = true
+      const currentFloor = 1
+
+      const result = getNextMove(requestQueue, isCurrentGoingUp, currentFloor)
+
+      expect(result).toBeUndefined()
+    })
+    test('should return next request in upward direction when current direction is up', () => {
+      const requestQueue: FloorRequest[] = [
+        { floor: 2, isGoingUp: true, dropUser: true },
+        { floor: 3, isGoingUp: true, dropUser: false },
+      ]
+      const isCurrentGoingUp = true
+      const currentFloor = 1
+
+      const result = getNextMove(requestQueue, isCurrentGoingUp, currentFloor)
+
+      expect(result).toEqual({ floor: 2, isGoingUp: true, dropUser: true })
+    })
+    test('should return next request in downward direction when current direction is down', () => {
+      const requestQueue: FloorRequest[] = [
+        { floor: 2, isGoingUp: false, dropUser: true },
+        { floor: 1, isGoingUp: false, dropUser: false },
+      ]
+      const isCurrentGoingUp = false
+      const currentFloor = 3
+
+      const result = getNextMove(requestQueue, isCurrentGoingUp, currentFloor)
+
+      expect(result).toEqual({ floor: 2, isGoingUp: false, dropUser: true })
+    })
+    test('should return next request in opposite direction when there are no requests in current direction', () => {
+      const requestQueue: FloorRequest[] = [
+        { floor: 3, isGoingUp: false, dropUser: true },
+        { floor: 2, isGoingUp: false, dropUser: false },
+      ]
+      const isCurrentGoingUp = true
+      const currentFloor = 1
+
+      const result = getNextMove(requestQueue, isCurrentGoingUp, currentFloor)
+
+      expect(result).toEqual({ floor: 3, isGoingUp: false, dropUser: true })
+    })
+    test('should return next request in opposite direction when there are no requests in current direction', () => {
+      const requestQueue: FloorRequest[] = [
+        { floor: 3, isGoingUp: false, dropUser: true },
+        { floor: 2, isGoingUp: false, dropUser: false },
+      ]
+      const isCurrentGoingUp = false
+      const currentFloor = 1
+
+      const result = getNextMove(requestQueue, isCurrentGoingUp, currentFloor)
+
+      expect(result).toEqual({ floor: 2, isGoingUp: false, dropUser: false })
     })
   })
 })
