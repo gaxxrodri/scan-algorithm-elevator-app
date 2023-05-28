@@ -35,7 +35,6 @@
     max-width: 500px;
 }
 
-
 .buttons-container {
     display: flex;
     flex-direction: row;
@@ -46,8 +45,14 @@
 .buttons-container__floor-button {
     width: 25%;
     margin: 5px;
+    display: flex;
+    justify-content: center;
+    color:white;
+}
 
-  }
+.buttons-container__floor-button:disabled{
+   color:#4c4e71
+}
   
   .buttons-container__floor-button:last-child {
     margin: 0 auto
@@ -55,7 +60,6 @@
 
 @media (max-width: 992px) {
   .modal__content {
-    border:1px solid red;
-    width: 60%;
+    width: 65%;
   }
 }
