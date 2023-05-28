@@ -9,26 +9,34 @@ export const useElevator = () => {
   const currentStatus = getCurrentStatus()
 
   const [requestQueue, setRequestQueue] = useState<FloorRequest[]>([])
-  const [openModal, setOpenModal] = useState<boolean>(false)
   const [isCurrentGoingUp, setIsCurrentGoingUp] = useState<boolean>(true)
 
-  useEffect(() => {
-    if (currentStatus === ElevatorStatus.Running || openModal) {
-      return
-    }
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
-    if (requestQueue.length !== 0) {
-      const updatedQueue = processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setOpenModal)
-      if (updatedQueue !== undefined) {
-        setRequestQueue(updatedQueue)
+  useEffect(() => {
+    ;(async () => {
+      if (currentStatus === ElevatorStatus.Running || requestQueue.length === 0 || isModalOpen) {
         return
       }
-      const nextMove = getNextMove(requestQueue, isCurrentGoingUp, currentFloor)
-      if (nextMove !== undefined) {
-        void moveElevator(nextMove)
+      const updatedQueue = processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setIsModalOpen)
+
+      if (updatedQueue !== undefined) {
+        setRequestQueue(updatedQueue)
+      } else {
+        const nextMove = getNextMove(requestQueue, isCurrentGoingUp, currentFloor)
+
+        if (nextMove !== undefined) {
+          try {
+            await moveElevator(nextMove)
+          } catch (error) {
+            console.error('An error occurred while moving the elevator: ', error)
+          }
+        }
       }
-    }
-  }, [currentFloor, openModal, requestQueue, isCurrentGoingUp])
+    })().catch(error => {
+      console.error('An error occurred during elevator operation: ', error)
+    })
+  }, [currentFloor, isModalOpen, requestQueue, isCurrentGoingUp])
 
   const moveElevator = async (nextMove: FloorRequest) => {
     if (nextMove.floor > currentFloor) {
@@ -50,7 +58,7 @@ export const useElevator = () => {
 
   const addStop = (floor: number) => {
     callElevator(floor, isCurrentGoingUp, true)
-    setOpenModal(false)
+    setIsModalOpen(false)
   }
-  return { callElevator, addStop, isCurrentGoingUp, currentFloor, currentStatus, requestQueue, openModal }
+  return { callElevator, addStop, isCurrentGoingUp, currentFloor, currentStatus, requestQueue, isModalOpen }
 }

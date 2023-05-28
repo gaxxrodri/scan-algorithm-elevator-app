@@ -1,5 +1,5 @@
 import Button from './components/Button/Button'
-import Modal from './components/Modal.tsx/Modal'
+import Modal from './components/Modal/Modal'
 import { useElevator } from './hooks/useElevator'
 import { Toaster } from 'sonner'
 import { ELEVATOR_STATUS_TEXT, floors } from './common/constants'
@@ -8,12 +8,12 @@ import { isFloorRequested } from './common/utils'
 import './App.css'
 
 const App = () => {
-  const { callElevator, currentFloor, currentStatus, requestQueue, openModal, addStop, isCurrentGoingUp } =
+  const { callElevator, currentFloor, currentStatus, requestQueue, isModalOpen, addStop, isCurrentGoingUp } =
     useElevator()
 
   return (
     <>
-      <Modal isOpen={openModal} addStop={addStop} isCurrentGoingUp={isCurrentGoingUp} currentFloor={currentFloor} />
+      <Modal isOpen={isModalOpen} addStop={addStop} isCurrentGoingUp={isCurrentGoingUp} currentFloor={currentFloor} />
       <Toaster position='top-right' richColors />
       <div>
         <h3>{ELEVATOR_STATUS_TEXT}</h3>

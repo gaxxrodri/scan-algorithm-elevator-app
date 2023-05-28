@@ -46,7 +46,7 @@ describe('useElevator hook tests', () => {
     })
   })
   describe('addStop function tests', () => {
-    test('should call function setOpenModal with false and add the stop to requestQueue', async () => {
+    test('should call function setIsModalOpen with false and add the stop to requestQueue', async () => {
       const setOpenModalSpy = sinon.spy()
       const { result } = renderHook(() => useElevator())
       const floorRequest = 6
