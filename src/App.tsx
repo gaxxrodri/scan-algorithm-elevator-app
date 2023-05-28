@@ -1,23 +1,19 @@
-import { ELEVATOR_STATUS_TEXT, floors } from './common/constants'
-import './App.css'
-import { useElevator } from './hooks/useElevator'
-import { ElevatorStatus } from './common/types'
-import { Toaster, toast } from 'sonner'
 import Button from './components/Button/Button'
+import Modal from './components/Modal.tsx/Modal'
+import { useElevator } from './hooks/useElevator'
+import { Toaster } from 'sonner'
+import { ELEVATOR_STATUS_TEXT, floors } from './common/constants'
+import { ElevatorStatus } from './common/types'
 import { isFloorRequested } from './common/utils'
-import { useEffect } from 'react'
+import './App.css'
 
 const App = () => {
-  const { callElevator, currentFloor, currentStatus, requestQueue } = useElevator()
-
-  useEffect(() => {
-    requestQueue.forEach(request => {
-      request.floor === currentFloor && request.dropUser && toast.success(`User arrived at floor ${currentFloor}.`)
-    })
-  }, [currentFloor])
+  const { callElevator, currentFloor, currentStatus, requestQueue, openModal, addStop, isCurrentGoingUp } =
+    useElevator()
 
   return (
     <>
+      <Modal isOpen={openModal} addStop={addStop} isCurrentGoingUp={isCurrentGoingUp} currentFloor={currentFloor} />
       <Toaster position='top-right' richColors />
       <div>
         <h3>{ELEVATOR_STATUS_TEXT}</h3>
