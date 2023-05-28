@@ -4,8 +4,7 @@ import { test } from 'vitest'
 import App from '../../../App'
 
 describe('App component', () => {
-  // Render the component
-  test('', async () => {
+  test('render the component correctly', async () => {
     render(<App />)
 
     // Verify that elevator status is displayed

@@ -12,7 +12,7 @@ describe('useInternalController tests', () => {
       expect(result.current.getCurrentStatus()).toEqual('Idle')
 
       act(() => {
-        result.current.up()
+        void result.current.up()
       })
 
       await waitForNextUpdate()
@@ -26,7 +26,7 @@ describe('useInternalController tests', () => {
       const { result, waitForNextUpdate } = renderHook(() => useInternalController())
 
       act(() => {
-        result.current.up()
+        void result.current.up()
       })
 
       await waitForNextUpdate()
@@ -34,7 +34,7 @@ describe('useInternalController tests', () => {
       expect(result.current.getCurrentFloor()).toEqual(1)
 
       act(() => {
-        result.current.down()
+        void result.current.down()
       })
 
       await waitForNextUpdate()
@@ -53,7 +53,7 @@ describe('useInternalController tests', () => {
     test('should return the floor 1', async () => {
       const { result, waitForNextUpdate } = renderHook(() => useInternalController())
       act(() => {
-        result.current.up()
+        void result.current.up()
       })
       await waitForNextUpdate()
 
@@ -70,7 +70,7 @@ describe('useInternalController tests', () => {
 
       const { result } = renderHook(() => useInternalController())
       act(() => {
-        result.current.up()
+        void result.current.up()
       })
       act(() => {
         clock.tick(500)
