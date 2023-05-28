@@ -67,40 +67,40 @@ describe('Utils function tests', () => {
       ]
       const isCurrentGoingUp = true
       const currentFloor = 3
-      const setOpenModal = sinon.spy()
+      const setIsModalOpen = sinon.spy()
 
-      const result = processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setOpenModal)
+      const result = processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setIsModalOpen)
 
       expect(result).toBeUndefined()
-      expect(setOpenModal.called).toBe(false)
+      expect(setIsModalOpen.called).toBe(false)
     })
-    test("should return undefined and not call setOpenModal if current floor is equal but direction doesn't match", () => {
+    test("should return undefined and not call setIsModalOpen if current floor is equal but direction doesn't match", () => {
       const requestQueue = [
         { floor: 1, isGoingUp: false, dropUser: true },
         { floor: 3, isGoingUp: false, dropUser: false },
       ]
       const isCurrentGoingUp = true
       const currentFloor = 3
-      const setOpenModal = sinon.spy()
+      const setIsModalOpen = sinon.spy()
 
-      const result = processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setOpenModal)
+      const result = processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setIsModalOpen)
 
       expect(result).toBeUndefined()
-      expect(setOpenModal.called).toBe(false)
+      expect(setIsModalOpen.called).toBe(false)
     })
-    test('should remove rechead request from queue and call setOpenModal', () => {
+    test('should remove rechead request from queue and call setIsModalOpen', () => {
       const requestQueue = [
         { floor: 3, isGoingUp: true, dropUser: false },
         { floor: 4, isGoingUp: true, dropUser: false },
       ]
       const isCurrentGoingUp = true
       const currentFloor = 3
-      const setOpenModal = sinon.spy()
+      const setIsModalOpen = sinon.spy()
 
-      const result = processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setOpenModal)
+      const result = processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setIsModalOpen)
 
       expect(result).toEqual([{ floor: 4, isGoingUp: true, dropUser: false }])
-      expect(setOpenModal.calledOnce).toBe(true)
+      expect(setIsModalOpen.calledOnce).toBe(true)
     })
     test('should call toast function with the correct message when drop user', () => {
       const successToastStub = sinon.stub(toast, 'success')
@@ -111,9 +111,9 @@ describe('Utils function tests', () => {
       ]
       const isCurrentGoingUp = true
       const currentFloor = 3
-      const setOpenModal = sinon.spy()
+      const setIsModalOpen = sinon.spy()
 
-      processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setOpenModal)
+      processReachedFloor(requestQueue, isCurrentGoingUp, currentFloor, setIsModalOpen)
 
       sinon.assert.calledWith(successToastStub, `User arrived at floor ${currentFloor}.`)
       afterEach(() => {
