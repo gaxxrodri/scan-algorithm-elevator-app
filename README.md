@@ -1,5 +1,5 @@
 # Elevator app based on the SCAN algorithm
- <p align="center"> <img  <img width="1285" alt="Captura de Pantalla 2023-05-26 a las 2 20 10 a  m" src="https://github.com/gaxxrodri/scan-algorithm-elevator-app/assets/76969924/c24d01bf-2d1d-4e53-889b-574bdd5be674" width="50%" height="50%">
+ <p align="center"> <img  alt="Captura de Pantalla 2023-05-26 a las 2 20 10 a  m" src="https://github.com/gaxxrodri/scan-algorithm-elevator-app/assets/76969924/c24d01bf-2d1d-4e53-889b-574bdd5be674" width="100%" height="60%">
 </p>
 
  
@@ -20,7 +20,10 @@ Typescript, Javascript, ReactJS
 Testing using React Testing Library, Vitest and Sinon
 
 ### Coverage: 
-<img width="957" alt="Captura de Pantalla 2023-05-28 a las 9 29 55 p  m" src="https://github.com/gaxxrodri/scan-algorithm-elevator-app/assets/76969924/a59c3f67-237b-4135-bc54-c334a5f923d1">
+<img width="70%" height="50%" alt="Captura de Pantalla 2023-05-28 a las 9 29 55 p  m" src="https://github.com/gaxxrodri/scan-algorithm-elevator-app/assets/76969924/a59c3f67-237b-4135-bc54-c334a5f923d1">
+
+## Google Lighthouse report
+<img width="70%" height="50%" alt="Captura de Pantalla 2023-05-28 a las 9 29 55 p  m" src="https://github.com/gaxxrodri/scan-algorithm-elevator-app/assets/76969924/3ffd83ee-5ec5-4705-87a4-722aee217046">
 
 
 ## Available Scripts
