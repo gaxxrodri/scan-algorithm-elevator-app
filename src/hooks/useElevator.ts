@@ -14,7 +14,7 @@ export const useElevator = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
-    ;(async () => {
+    (async () => {
       if (currentStatus === ElevatorStatus.Running || requestQueue.length === 0 || isModalOpen) {
         return
       }
